@@ -18,12 +18,9 @@ type SaveSendResult struct {
 }
 
 type BroadcastSendResult struct {
-	Code    int    `json:"code"`              // 必选,返回码
-	Message string `json:"message,omitempty"` // 可选，返回消息
-	Data    struct {
-		MessageID string `json:"message_id"` //消息 ID
-		TaskId    string `json:"task_id"`    //推送任务 ID
-	} `json:"data,omitempty"` // 可选，返回结果
+	Code    int                    `json:"code"`              // 必选,返回码
+	Message string                 `json:"message,omitempty"` // 可选，返回消息
+	Data    map[string]interface{} `json:"data,omitempty"`    // 可选，返回结果
 }
 
 type UnicastSendResult struct {
