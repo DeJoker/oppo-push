@@ -40,10 +40,10 @@ func (c *OppoPush) SaveMessageContent(msg *NotificationMessage) (*SaveSendResult
 }
 
 // 广播推送-通知栏消息
-func (c *OppoPush) Broadcast(broadcast *Broadcast) (*BroadcastSendResult, error) {
+func (c *OppoPush) Broadcast(broadcast *Broadcast) (*BroadcastSendResult, string, error) {
 	tokenInstance, err := GetToken(c.appKey, c.masterSecret)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	params := url.Values{}
 	params.Add("message_id", broadcast.MessageID)
@@ -52,17 +52,17 @@ func (c *OppoPush) Broadcast(broadcast *Broadcast) (*BroadcastSendResult, error)
 	params.Add("auth_token", tokenInstance.AccessToken)
 	bytes, err := doPost(PushHost+MessageBroadcastURL, params)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	var result BroadcastSendResult
 	err = json.Unmarshal(bytes, &result)
 	if err != nil {
-		return nil, err
+		return nil, string(bytes), err
 	}
 	if result.Code != 0 {
-		return nil, errors.New(result.Message)
+		return nil, string(bytes), errors.New(result.Message)
 	}
-	return &result, nil
+	return &result, string(bytes), nil
 }
 
 // 单推-通知栏消息推送
