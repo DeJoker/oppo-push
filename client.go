@@ -10,18 +10,23 @@ import (
 type OppoPush struct {
 	appKey       string
 	masterSecret string
+	TokenIns *OppoToken
 }
 
 func NewClient(appKey, masterSecret string) *OppoPush {
 	return &OppoPush{
 		appKey:       appKey,
 		masterSecret: masterSecret,
+		TokenIns: &OppoToken{
+			AccessToken: "",
+			CreateTime:  0,
+		},
 	}
 }
 
 // 保存通知栏消息内容体
 func (c *OppoPush) SaveMessageContent(msg *NotificationMessage) (*SaveSendResult, error) {
-	tokenInstance, err := GetToken(c.appKey, c.masterSecret)
+	tokenInstance, err := c.GetToken(c.appKey, c.masterSecret)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +46,7 @@ func (c *OppoPush) SaveMessageContent(msg *NotificationMessage) (*SaveSendResult
 
 // 广播推送-通知栏消息
 func (c *OppoPush) Broadcast(broadcast *Broadcast) (*BroadcastSendResult, string, error) {
-	tokenInstance, err := GetToken(c.appKey, c.masterSecret)
+	tokenInstance, err := c.GetToken(c.appKey, c.masterSecret)
 	if err != nil {
 		return nil, "", err
 	}
@@ -67,7 +72,7 @@ func (c *OppoPush) Broadcast(broadcast *Broadcast) (*BroadcastSendResult, string
 
 // 单推-通知栏消息推送
 func (c *OppoPush) Unicast(message *Message) (*UnicastSendResult, error) {
-	tokenInstance, err := GetToken(c.appKey, c.masterSecret)
+	tokenInstance, err := c.GetToken(c.appKey, c.masterSecret)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +100,7 @@ func (c *OppoPush) UnicastBatch(messages []Message) (*UnicastBatchSendResult, er
 	if err != nil {
 		return nil, err
 	}
-	tokenInstance, err := GetToken(c.appKey, c.masterSecret)
+	tokenInstance, err := c.GetToken(c.appKey, c.masterSecret)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +124,7 @@ func (c *OppoPush) UnicastBatch(messages []Message) (*UnicastBatchSendResult, er
 
 // 获取失效的registration_id列表
 func (c *OppoPush) FetchInvalidRegidList() (*FetchInvalidRegidListSendResult, error) {
-	tokenInstance, err := GetToken(c.appKey, c.masterSecret)
+	tokenInstance, err := c.GetToken(c.appKey, c.masterSecret)
 	if err != nil {
 		return nil, err
 	}

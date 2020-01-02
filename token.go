@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	MaxTimeToLive = 3600 * 24
+	TokenTimeToLive = 3600 * 8
 )
 
 type OppoToken struct {
@@ -21,20 +21,11 @@ type OppoToken struct {
 	CreateTime  int64  `json:"create_time"`
 }
 
-var tokenInstance *OppoToken
-
-func init() {
-	tokenInstance = &OppoToken{
-		AccessToken: "",
-		CreateTime:  0,
-	}
-}
-
 //GetToken 获取AccessToken值
-func GetToken(appKey, masterSecret string) (*OppoToken, error) {
+func (c *OppoPush) GetToken(appKey, masterSecret string) (*OppoToken, error) {
 	nowMilliSecond := time.Now().UnixNano() / 1e6
-	if (nowMilliSecond-tokenInstance.CreateTime) < MaxTimeToLive*1000 && tokenInstance.AccessToken != "" {
-		return tokenInstance, nil
+	if (nowMilliSecond-c.TokenIns.CreateTime) < TokenTimeToLive*1000 && c.TokenIns.AccessToken != "" {
+		return c.TokenIns, nil
 	}
 	timestamp := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
 	shaByte := sha256.Sum256([]byte(appKey + timestamp + masterSecret))
@@ -60,7 +51,7 @@ func GetToken(appKey, masterSecret string) (*OppoToken, error) {
 	if result.Code != 0 {
 		return nil, errors.New(result.Message)
 	}
-	tokenInstance.AccessToken = result.Data.AuthToken
-	tokenInstance.CreateTime = result.Data.CreateTime
-	return tokenInstance, nil
+	c.TokenIns.AccessToken = result.Data.AuthToken
+	c.TokenIns.CreateTime = result.Data.CreateTime
+	return c.TokenIns, nil
 }
