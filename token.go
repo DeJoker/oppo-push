@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	TokenTimeToLive = 3600 * 8
+	DefaultTimeToLive = 3600 * 1000 // one hour
 )
 
 type OppoToken struct {
@@ -24,10 +24,10 @@ type OppoToken struct {
 //GetToken 获取AccessToken值
 func (c *OppoPush) GetToken(appKey, masterSecret string) (*OppoToken, error) {
 	nowMilliSecond := time.Now().UnixNano() / 1e6
-	if (nowMilliSecond-c.TokenIns.CreateTime) < TokenTimeToLive*1000 && c.TokenIns.AccessToken != "" {
+	if (nowMilliSecond-c.TokenIns.CreateTime) < DefaultTimeToLive && c.TokenIns.AccessToken != "" {
 		return c.TokenIns, nil
 	}
-	timestamp := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
+	timestamp := strconv.FormatInt(nowMilliSecond, 10)
 	shaByte := sha256.Sum256([]byte(appKey + timestamp + masterSecret))
 	sign := fmt.Sprintf("%x", shaByte)
 	params := url.Values{}

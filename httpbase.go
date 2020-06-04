@@ -7,36 +7,41 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
+)
+
+var (
+	client = &http.Client{
+		Timeout : time.Second * 60,
+	}
+)
+
+const (
+	RetryTimes       = 2
 )
 
 func doPost(url string, form url.Values) ([]byte, error) {
-	var result []byte
-	var req *http.Request
-	var resp *http.Response
-	var err error
-	req, err = http.NewRequest("POST", url, strings.NewReader(form.Encode()))
+	req, err := http.NewRequest("POST", url, strings.NewReader(form.Encode()))
 	if err != nil {
 		panic(err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	client := &http.Client{}
 	tryTime := 0
 tryAgain:
-	resp, err = client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		tryTime++
-		if tryTime < 3 {
+		if tryTime < RetryTimes {
 			goto tryAgain
 		}
 		return nil, err
 	}
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("network error")
+		return nil, errors.New("HTTP status code:"+strconv.Itoa(resp.StatusCode))
 	}
-	result, err = ioutil.ReadAll(resp.Body)
+	result, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -49,24 +54,20 @@ tryAgain:
 }
 
 func doGet(url string, params string) ([]byte, error) {
-	var result []byte
-	var req *http.Request
-	var resp *http.Response
-	var err error
-	req, err = http.NewRequest("GET", url+params, nil)
+	req, err := http.NewRequest("GET", url+params, nil)
 	if err != nil {
 		panic(err)
 	}
-	client := &http.Client{}
-	resp, err = client.Do(req)
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("network error")
+		return nil, errors.New("HTTP status code:"+strconv.Itoa(resp.StatusCode))
 	}
-	result, err = ioutil.ReadAll(resp.Body)
+	result, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
