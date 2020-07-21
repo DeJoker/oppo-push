@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strconv"
 	"time"
@@ -34,17 +32,14 @@ func (c *OppoPush) GetToken(appKey, masterSecret string) (*OppoToken, error) {
 	params.Add("app_key", appKey)
 	params.Add("sign", sign)
 	params.Add("timestamp", timestamp)
-	resp, err := http.PostForm(PushHost+AuthURL, params)
+
+	res, err := doPost(PushHost+AuthURL, params)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
+
 	var result AuthSendResult
-	err = json.Unmarshal(body, &result)
+	err = json.Unmarshal(res, &result)
 	if err != nil {
 		return nil, err
 	}
