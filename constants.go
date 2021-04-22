@@ -4,6 +4,8 @@ package oppopush
 const (
 	PushHost     = "https://api.push.oppomobile.com"
 	FeedbackHost = "https://feedback.push.oppomobile.com"
+
+	UploadHost   = "https://api-media.push.heytapmobi.com"
 )
 
 const (
@@ -13,4 +15,6 @@ const (
 	MessageUnicastURL        = "/server/v1/message/notification/unicast"              // 单推-通知栏消息推送
 	MessageUnicastBatchURL   = "/server/v1/message/notification/unicast_batch"        // 批量单推-通知栏消息推送
 	FetchInvalidRegidListURL = "/server/v1/feedback/fetch_invalid_regidList"          // Feedback-获取失效的 registration_id 列表
+
+	UploadIconURL            = "/server/v1/media/upload/small_picture"                // 上传icon
 )

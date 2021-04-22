@@ -31,6 +31,15 @@ type UnicastSendResult struct {
 	} `json:"data,omitempty"` // 可选，返回结果
 }
 
+
+type UploadSendResult struct {
+	Code    int    `json:"code"`              // 必选,返回码
+	Message string `json:"message,omitempty"` // 可选，返回消息
+	Data    struct {
+		SmallPicId string `json:"small_picture_id"` //消息 ID
+	} `json:"data,omitempty"` // 可选，返回结果
+}
+
 type UnicastBatchSendResult struct {
 	Code    int    `json:"code"`              // 必选,返回码
 	Message string `json:"message,omitempty"` // 可选，返回消息

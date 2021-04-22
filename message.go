@@ -24,6 +24,9 @@ type NotificationMessage struct {
 	CallBackURL         string `json:"call_back_url,omitempty"`         //*仅支持 registrationId 或 aliasName两种推送方式*应用接收消息到达回执的回调 URL，字数限制200以内，中英文均以一个计算。OPPO Push 服务器 POST 一个 JSON 数据到 call_back_url；
 	CallBackParameter   string `json:"call_back_parameter,omitempty"`   //App 开发者自定义回执参数，字数限制50 以内，中英文均以一个计算。
 	ChannelID           string `json:"channel_id,omitempty"`            //通知栏通（NotificationChannel），从Android9 开始发送通知消息必须要指定通道 Id
+
+	BigPictureId        string `json:"big_picture_id,omitempty"`        //
+	SmallPictureId      string `json:"small_picture_id,omitempty"`      // 消息右侧图标
 }
 
 // 广播推送
@@ -206,6 +209,11 @@ func (n *NotificationMessage) SetCallBackUrl(callBackUrl string) *NotificationMe
 func (m *Message) SetCallBackUrl(callBackUrl string) *Message {
 	m.Notification.CallBackURL = callBackUrl
 	return m
+}
+
+func (n *NotificationMessage) SetSmallPictureId(smallPictureId string) *NotificationMessage {
+	n.SmallPictureId = smallPictureId
+	return n
 }
 
 func (n *NotificationMessage) SetCallBackParameter(callBackParameter string) *NotificationMessage {

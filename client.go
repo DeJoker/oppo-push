@@ -145,6 +145,32 @@ func (c *OppoPush) FetchInvalidRegidList() (*FetchInvalidRegidListSendResult, er
 	return &result, nil
 }
 
+
+// 上传小图
+func (c *OppoPush) UploadIcon(filename string, ttl int) (*UploadSendResult, error) {
+	tokenInstance, err := c.GetToken(c.AppKey, c.MasterSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	p := make(map[string]string)
+	p["picture_ttl"] = strconv.Itoa(ttl)
+	p["auth_token"] = tokenInstance.AccessToken
+
+	str := commonUploadRealFile(filename, UploadHost+UploadIconURL, p)
+
+	var result UploadSendResult
+	err = json.Unmarshal([]byte(str), &result)
+	if err != nil {
+		return nil, err
+	}
+	if result.Code != 0 {
+		return nil, errors.New(result.Message)
+	}
+	return &result, nil
+}
+
+
 func defaultForm(msg *NotificationMessage) url.Values {
 	form := url.Values{}
 	if msg.AppMessageID != "" {
@@ -209,6 +235,13 @@ func defaultForm(msg *NotificationMessage) url.Values {
 	if msg.ChannelID != "" {
 		form.Add("channel_id", msg.ChannelID)
 	}
+	if msg.SmallPictureId != "" {
+		form.Add("small_picture_id", msg.SmallPictureId)
+	}
+	if msg.BigPictureId != "" {
+		form.Add("big_picture_id", msg.BigPictureId)
+	}
+
 	return form
 }
 
