@@ -82,7 +82,7 @@ func doGet(url string, params string) ([]byte, error) {
 }
 
 
-func commonUploadRealFile(filename, url string, params map[string]string) string {
+func commonUploadRealFile(filename string, fileBuffer []byte, url string, params map[string]string) string {
 	bufReader := new(bytes.Buffer)
 	mpWriter := multipart.NewWriter(bufReader)
 
@@ -91,7 +91,11 @@ func commonUploadRealFile(filename, url string, params map[string]string) string
 		mpWriter.WriteField(key, value)
 	}
 	//最后写入文件
-	constructFormFile(mpWriter, filename)
+	if fileBuffer == nil {
+		constructFormFile(mpWriter, filename)
+	} else {
+		constructFormBuffer(mpWriter, fileBuffer, filename)
+	}
 	mpWriter.Close()
 
 	req, _ := http.NewRequest("POST", url, bufReader)
@@ -111,6 +115,16 @@ func commonUploadRealFile(filename, url string, params map[string]string) string
 }
 
 
+func constructFormBuffer(writer *multipart.Writer, fileBuffer []byte, filename string) error {
+	//推断Content-Type
+	contentType := http.DetectContentType(fileBuffer)
+
+	waitToWriteContent, _ := createFormFile(writer, contentType, "file", filename)
+	//写入文件内容
+	waitToWriteContent.Write(fileBuffer)
+
+	return nil
+}
 
 func constructFormFile(writer *multipart.Writer, filename string) error {
 	f, _ := os.Open(filename)

@@ -1,8 +1,12 @@
 package oppopush
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"testing"
+	"net/http"
+	"time"
 )
 
 
@@ -15,8 +19,54 @@ var (
 	oc = NewClient(appKey, masterSecret)
 )
 
+func TestIconPushBuffer(t *testing.T) {
+	buf,err := httpGet("https://i.ibb.co/tPcQnJr/picx.png")
+	if err != nil {
+		t.Log(err)
+		return;
+	}
+
+	res,err := oc.UploadIcon("pickkfwe.png", buf, 86400)
+	if err != nil {
+		t.Log(err)
+		return;
+	}
+	
+	OppoPushIcon("CN_8995c8e604617e01e0c2a845df06d2d3", res.Data.SmallPicId)
+}
+
+
+
+
+func httpGet(durl string) ([]byte, error) {
+
+	client := http.DefaultClient
+	client.Timeout = time.Second * 60
+	resp, err := client.Get(durl)
+
+	if err != nil {
+		return nil, err
+	}
+	if resp.ContentLength <= 0 {
+		return nil, errors.New("http Get rsp length <=0")
+	}
+
+	raw := resp.Body
+	defer raw.Close()
+
+	defer resp.Body.Close()
+	rspBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return rspBody, nil
+}
+
+
+
 func TestIconPush(t *testing.T) {
-	res,err := oc.UploadIcon("F:\\pic3_120_120.png", 86400)
+	res,err := oc.UploadIcon("F:\\pic3_120_120.png", nil, 86400)
 	if err != nil {
 		t.Log(err)
 		return;
@@ -28,7 +78,7 @@ func TestIconPush(t *testing.T) {
 
 func OppoPushIcon(targetId, picId string) {
 	//保存通知栏消息内容体
-	pp := "开头"
+	pp := "67878"
 	msg := NewSaveMessageContent(pp+"4532453453", pp+"hrehertfgd33")
 	msg.SetID(pp)
 

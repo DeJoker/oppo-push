@@ -147,7 +147,7 @@ func (c *OppoPush) FetchInvalidRegidList() (*FetchInvalidRegidListSendResult, er
 
 
 // 上传小图
-func (c *OppoPush) UploadIcon(filename string, ttl int) (*UploadSendResult, error) {
+func (c *OppoPush) UploadIcon(filename string, fileBuffer []byte, ttl int) (*UploadSendResult, error) {
 	tokenInstance, err := c.GetToken(c.AppKey, c.MasterSecret)
 	if err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ func (c *OppoPush) UploadIcon(filename string, ttl int) (*UploadSendResult, erro
 	p["picture_ttl"] = strconv.Itoa(ttl)
 	p["auth_token"] = tokenInstance.AccessToken
 
-	str := commonUploadRealFile(filename, UploadHost+UploadIconURL, p)
+	str := commonUploadRealFile(filename, fileBuffer, UploadHost+UploadIconURL, p)
 
 	var result UploadSendResult
 	err = json.Unmarshal([]byte(str), &result)
